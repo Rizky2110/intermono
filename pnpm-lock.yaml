@@ -186,6 +186,7 @@ importers:
       eslint: ^7.32.0
       eslint-config-custom: workspace:*
       next: 12.2.3
+      phosphor-react: ^1.4.1
       react: 18.1.0
       styled-components: ^5.3.5
       tsconfig: workspace:*
@@ -200,6 +201,7 @@ importers:
       '@types/styled-components': 5.1.26
       eslint: 7.32.0
       eslint-config-custom: link:../eslint-config-custom
+      phosphor-react: 1.4.1_react@18.1.0
       react: 18.1.0
       tsconfig: link:../tsconfig
       typescript: 4.7.4
@@ -5017,7 +5019,6 @@ packages:
       react: '>=16'
     dependencies:
       react: 18.1.0
-    dev: false
 
   /picocolors/1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}

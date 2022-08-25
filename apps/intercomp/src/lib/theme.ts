@@ -8,9 +8,9 @@ export type ColorPallete = {
   primary02: string;
   secondary01: string;
   secondary02: string;
-  gray01: string;
-  gray02: string;
-  gray03: string;
+  light01: string;
+  light02: string;
+  light03: string;
   success01: string;
   success02: string;
   success03: string;
@@ -18,8 +18,11 @@ export type ColorPallete = {
   danger02: string;
   danger03: string;
   info01: string;
+  info02: string;
+  info03: string;
   warning01: string;
   warning02: string;
+  warning03: string;
   neutral100: string;
   neutral090: string;
   neutral080: string;
@@ -42,18 +45,20 @@ export type RootTheme = {
   warning: string;
   success: string;
   info: string;
+  light: string;
 };
 
 const rootPalette: RootTheme = {
-  primary01: "#1E1E24",
-  primary02: "#EF8354",
-  secondary01: "#FCE4DA",
+  primary01: "#19223F",
+  primary02: "#FC4549",
+  secondary01: "#00C6FF",
   secondary02: "#FDF1EC",
   body: "#A6A6B5",
-  success: "#51DC6B",
-  danger: "#FB5758",
-  info: "#34B3F1",
-  warning: "#FEC124",
+  success: "#4CAF50",
+  danger: "#FC4549",
+  info: "#00C6FF",
+  warning: "#FFC107",
+  light: "#A6A6B5",
 };
 
 const paletteNormal: ColorPallete = {
@@ -63,18 +68,21 @@ const paletteNormal: ColorPallete = {
   primary02: rootPalette.primary02,
   secondary01: rootPalette.secondary01,
   secondary02: rootPalette.secondary02,
-  success01: rootPalette.success, // #51DC6B
-  success02: shadeColor(rootPalette.success, 32.8), // #DCF9E1
+  success01: rootPalette.success,
+  success02: shadeColor(rootPalette.success, 32.8),
   success03: shadeColor(rootPalette.success, 36.9),
   danger01: rootPalette.danger,
-  danger02: shadeColor(rootPalette.danger, 25.7), // #FED7D7
-  danger03: shadeColor(rootPalette.danger, 29.5), // #FEEBEB
+  danger02: shadeColor(rootPalette.danger, 25.7),
+  danger03: shadeColor(rootPalette.danger, 29.5),
   info01: rootPalette.info, // #34B3F1
+  info02: shadeColor(rootPalette.info, 32.8),
+  info03: shadeColor(rootPalette.info, 36.9),
   warning01: rootPalette.warning,
   warning02: shadeColor(rootPalette.warning, 39.2),
-  gray01: "#A6A6B5",
-  gray02: "#C7C7D1",
-  gray03: "#E9E9ED",
+  warning03: shadeColor(rootPalette.warning, 42),
+  light01: rootPalette.light,
+  light02: shadeColor(rootPalette.light, 12),
+  light03: shadeColor(rootPalette.light, 24),
   neutral100: "#0A0A0A",
   neutral090: "#404040",
   neutral080: "#616161",
@@ -125,21 +133,17 @@ export const defaultTheme: DefaultTheme = {
     body1: paletteNormal.neutral030,
     body2: paletteNormal.neutral040,
     body3: paletteNormal.neutral070,
-    devider: paletteNormal.gray02,
+    divider: paletteNormal.light02,
     text: paletteNormal.primary01,
-    sidebar: paletteNormal.primary01,
-    sidebarText: paletteNormal.primary01,
-    searchbox: paletteNormal.primary02,
-    dashboardAccent: paletteNormal.secondary02,
+    text1: paletteNormal.white,
+    text2: paletteNormal.primary02,
+    shadow: paletteNormal.black,
+    shadow1: paletteNormal.white,
+    shadow2: paletteNormal.primary02,
+    accent: paletteNormal.secondary02,
   },
   width: {
-    sidebar: "322px",
-    sidebarClose: "88px",
-    defaultRounded: "0.25em",
-    modalSmall: "388.5px",
-    modalMedium: "600px",
-    modalLarge: "900px",
-    modalExLarge: "1200px",
+    round: "0.5em",
   },
   typography: {
     size: {
@@ -171,6 +175,11 @@ export const defaultTheme: DefaultTheme = {
     height: 1.5,
   },
   components: {
+    appBar: {
+      body: paletteNormal.primary01,
+      text: paletteNormal.white,
+      searchBox: paletteNormal.primary02,
+    },
     alert: {
       success: {
         body: paletteNormal.success03,
@@ -199,157 +208,8 @@ export const defaultTheme: DefaultTheme = {
         text: paletteNormal.info01,
       },
       disabled: {
-        body: paletteNormal.gray03,
-        text: paletteNormal.gray01,
-      },
-    },
-  },
-};
-
-const paletteDark: ColorPallete = {
-  white: "#ffffff",
-  black: "#000000",
-  primary01: "#395B64",
-  primary02: "#2C3333",
-  secondary01: shadeColor("#395B64", 0),
-  secondary02: "#598C9B",
-  success01: rootPalette.success, // #51DC6B
-  success02: shadeColor(rootPalette.success, 32.8), // #DCF9E1
-  success03: shadeColor(rootPalette.success, 36.9),
-  danger01: rootPalette.danger,
-  danger02: shadeColor(rootPalette.danger, 25.7), // #FED7D7
-  danger03: shadeColor(rootPalette.danger, 29.5), // #FEEBEB
-  info01: rootPalette.info, // #34B3F1
-  warning01: rootPalette.warning,
-  warning02: shadeColor(rootPalette.warning, 39.2),
-  gray01: "#A6A6B5",
-  gray02: "#C7C7D1",
-  gray03: "#E9E9ED",
-  neutral100: "#0A0A0A",
-  neutral090: "#404040",
-  neutral080: "#616161",
-  neutral070: "#757575",
-  neutral060: "#9e9e9e",
-  neutral050: "#c2c2c2",
-  neutral040: "#E0E0E0",
-  neutral030: "#EDEDED",
-  neutral020: "#F5F5F5",
-  neutral010: "#FFFFFF",
-};
-export const darkTheme: DefaultTheme = {
-  colorPalette: paletteDark,
-  palette: {
-    primary: {
-      default: paletteDark.primary01,
-      opposite: paletteDark.white,
-    },
-    secondary: {
-      default: paletteDark.primary02,
-      opposite: paletteDark.white,
-    },
-    info: {
-      default: paletteDark.info01,
-      opposite: paletteDark.white,
-    },
-    success: {
-      default: paletteDark.success01,
-      opposite: paletteDark.white,
-    },
-    error: {
-      default: paletteDark.danger01,
-      opposite: paletteDark.white,
-    },
-    light: {
-      default: paletteDark.white,
-      opposite: paletteDark.primary01,
-    },
-  },
-  colors: {
-    primary: paletteDark.primary01,
-    secondary: paletteDark.primary02,
-    info: paletteDark.info01,
-    success: paletteDark.success01,
-    error: paletteDark.danger01,
-    body: shadeColor(paletteDark.primary02, 10),
-    body1: paletteDark.neutral070,
-    body2: paletteDark.neutral060,
-    body3: paletteDark.neutral030,
-    devider: paletteDark.gray03,
-    text: paletteDark.white,
-    sidebar: paletteDark.primary02,
-    sidebarText: paletteDark.primary02,
-    searchbox: paletteDark.primary01,
-    dashboardAccent: paletteDark.secondary02,
-  },
-  width: {
-    sidebar: "322px",
-    sidebarClose: "88px",
-    defaultRounded: "0.25em",
-    modalSmall: "388.5px",
-    modalMedium: "600px",
-    modalLarge: "900px",
-    modalExLarge: "1200px",
-  },
-  typography: {
-    size: {
-      button: "1.25rem",
-      sub1: "1.25rem",
-      sub2: "1rem",
-      sub3: "0.875rem",
-      body1: "1rem",
-      body2: "0.875rem",
-      cap1: "0.75rem",
-      cap2: "0.625rem",
-      icon1: "1.5rem",
-      icon2: "2rem",
-      icon3: "2.5rem",
-      title: "2rem",
-    },
-    weight: {
-      button: 500,
-      sub1: 700,
-      sub2: 600,
-      sub3: 500,
-      body1: 500,
-      body2: 400,
-      cap1: 400,
-      cap2: 400,
-    },
-    type: "Poppins",
-    spacing: "0.01em",
-    height: 1.5,
-  },
-  components: {
-    alert: {
-      success: {
-        body: paletteDark.success03,
-        button: paletteDark.success01,
-      },
-      error: {
-        body: paletteDark.danger03,
-        button: paletteDark.danger01,
-      },
-      warning: {
-        body: paletteDark.warning02,
-        button: paletteDark.warning01,
-      },
-    },
-    badge: {
-      success: {
-        body: paletteDark.success03,
-        text: paletteDark.success01,
-      },
-      error: {
-        body: paletteDark.danger03,
-        text: paletteDark.danger01,
-      },
-      info: {
-        body: hexToHsl(paletteDark.info01, 30),
-        text: paletteDark.info01,
-      },
-      disabled: {
-        body: paletteDark.gray03,
-        text: paletteDark.gray01,
+        body: paletteNormal.light03,
+        text: paletteNormal.light01,
       },
     },
   },
@@ -357,11 +217,9 @@ export const darkTheme: DefaultTheme = {
 
 export const listTheme: { [key: string]: DefaultTheme } = {
   defaultTheme,
-  darkTheme,
 };
 
 export const GlobalStyles = createGlobalStyle`
-  
   body {
     font-family: 'Poppins', sans-serif;
     background-color: ${(props) => props.theme.colors.body};

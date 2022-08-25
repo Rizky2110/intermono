@@ -1,5 +1,4 @@
 import { hexToHsl } from "core";
-import Link from "next/link";
 import styled from "styled-components";
 
 export interface ButtonProps extends React.ComponentPropsWithRef<"button"> {
@@ -9,7 +8,6 @@ export interface ButtonProps extends React.ComponentPropsWithRef<"button"> {
   variant?: "contain" | "outline" | "text";
   size?: "small" | "medium" | "large";
   palette?: "primary" | "secondary" | "error" | "info" | "success";
-  href?: string;
 }
 
 const StyledButton = styled("button")<ButtonProps>`
@@ -98,19 +96,7 @@ const StyledButton = styled("button")<ButtonProps>`
 export const Button: React.FC<ButtonProps> = function Button(
   props: ButtonProps
 ) {
-  const { children, startIcon, endIcon, href, ...rest } = props;
-  if (href)
-    return (
-      <Link href={href} passHref>
-        <StyledButton {...rest}>
-          <div className="btn-container">
-            {startIcon && <div className="icon">{startIcon}</div>}
-            <span className="label">{children}</span>
-            {endIcon && <div className="icon">{endIcon}</div>}
-          </div>
-        </StyledButton>
-      </Link>
-    );
+  const { children, startIcon, endIcon, ...rest } = props;
   return (
     <StyledButton {...rest}>
       <div className="btn-container">

@@ -38,6 +38,11 @@ declare module "styled-components" {
       text: string;
     };
   };
+  type TAppBar = {
+    body: string;
+    text: string;
+    searchBox: string;
+  };
   export interface DefaultTheme {
     colorPalette: {
       [key: string]: string;
@@ -47,9 +52,9 @@ declare module "styled-components" {
       primary02: string;
       secondary01: string;
       secondary02: string;
-      gray01: string;
-      gray02: string;
-      gray03: string;
+      light01: string;
+      light02: string;
+      light03: string;
       success01: string;
       success02: string;
       success03: string;
@@ -71,13 +76,7 @@ declare module "styled-components" {
       neutral010: string;
     };
     width: {
-      sidebar: string;
-      sidebarClose: string;
-      defaultRounded: string;
-      modalSmall: string;
-      modalMedium: string;
-      modalLarge: string;
-      modalExLarge: string;
+      round: string;
     };
     palette: {
       [key: string]: TPalette;
@@ -97,13 +96,14 @@ declare module "styled-components" {
       body: string;
       body1: string;
       body2: string;
-      body3: string;
-      devider: string;
+      divider: string;
       text: string;
-      sidebar: string;
-      sidebarText: string;
-      searchbox: string;
-      dashboardAccent: string;
+      text1: string;
+      text2: string;
+      accent: string;
+      shadow: string;
+      shadow1: string;
+      shadow2: string;
     };
     typography: {
       size: {
@@ -137,6 +137,7 @@ declare module "styled-components" {
     components: {
       alert: TAlert;
       badge: TBadge;
+      appBar: TAppBar;
     };
   }
 }

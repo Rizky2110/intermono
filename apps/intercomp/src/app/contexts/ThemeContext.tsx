@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { listTheme } from "src/lib/theme";
-import { UITheme } from "ui";
+import { StyledTheme } from "ui/sc";
 
 const ThemeController = () => {
   const [theme, setTheme] = useState("defaultTheme");
@@ -37,7 +37,7 @@ export const ThemeContextConsumer: React.FC<ThemeContextProviderProps> =
           const { theme } = ctx;
           return (
             <ThemeProvider theme={listTheme[theme]}>
-              <UITheme theme={listTheme[theme]}>{children}</UITheme>
+              <StyledTheme theme={listTheme[theme]}>{children}</StyledTheme>
             </ThemeProvider>
           );
         }}
