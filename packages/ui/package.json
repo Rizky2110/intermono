@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "core": "workspace:*",
+    "next": "12.2.3",
     "styled-components": "^5.3.5"
   }
 }
