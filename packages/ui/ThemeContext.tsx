@@ -9,41 +9,53 @@ const ThemeController = () => {
   };
 };
 
-export const ThemeContext = createContext<ReturnType<typeof ThemeController>>({
+export const UIContext = createContext<ReturnType<typeof ThemeController>>({
   theme: "defaultTheme",
   setTheme: () => {},
 });
 
-interface ThemeContextProviderProps {
+interface UIContextProviderProps {
   children: React.ReactNode;
 }
 
-interface ThemeContextConsumerProps {
+interface UIContextConsumerProps {
   children: React.ReactNode;
   themeList: { [key: string]: DefaultTheme };
 }
 
-export const ThemeContextProvider: React.FC<ThemeContextProviderProps> =
-  function ThemeContextProvider({ children }: ThemeContextProviderProps) {
+export const UIContextProvider: React.FC<UIContextProviderProps> =
+  function UIContextProvider({ children }: UIContextProviderProps) {
     return (
-      <ThemeContext.Provider value={ThemeController()}>
+      <UIContext.Provider value={ThemeController()}>
         {children}
-      </ThemeContext.Provider>
+      </UIContext.Provider>
     );
   };
 
-export const ThemeContextConsumer: React.FC<ThemeContextConsumerProps> =
-  function ThemeContextConsumer({ children, themeList }) {
+export const UIContextConsumer: React.FC<UIContextConsumerProps> =
+  function UIContextConsumer({ children, themeList }) {
     return (
-      <ThemeContext.Consumer>
+      <UIContext.Consumer>
         {(ctx) => {
           const { theme } = ctx;
           return (
             <ThemeProvider theme={themeList[theme]}>{children}</ThemeProvider>
           );
         }}
-      </ThemeContext.Consumer>
+      </UIContext.Consumer>
     );
   };
 
-export const useTheme = () => useContext(ThemeContext);
+interface UIThemeProps {
+  children: React.ReactNode;
+  theme: DefaultTheme;
+}
+
+export const UITheme: React.FC<UIThemeProps> = function UITheme({
+  theme,
+  children,
+}: UIThemeProps) {
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+};
+
+export const useTheme = () => useContext(UIContext);

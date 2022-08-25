@@ -5,7 +5,10 @@ import type { AppProps } from "next/app";
 import type { NextLayout } from "next";
 import { GlobalStyles, listTheme } from "src/lib/theme";
 
-import { ThemeContextProvider, ThemeContextConsumer } from "ui";
+import {
+  ThemeContextProvider,
+  ThemeContextConsumer,
+} from "src/app/contexts/ThemeContext";
 import { useRouter } from "next/router";
 import nProgress from "nprogress";
 import { NavbarContextProvider } from "src/app/contexts/NavbarContext";
@@ -48,12 +51,12 @@ function MyApp({ Component, pageProps }: AppLayoutProps) {
 
   return (
     <ThemeContextProvider>
-      <NavbarContextProvider>
-        <ThemeContextConsumer themeList={listTheme}>
-          {/* <GlobalStyles /> */}
+      <ThemeContextConsumer>
+        <NavbarContextProvider>
+          <GlobalStyles />
           {getLayout(<Component {...pageProps} />)}
-        </ThemeContextConsumer>
-      </NavbarContextProvider>
+        </NavbarContextProvider>
+      </ThemeContextConsumer>
     </ThemeContextProvider>
   );
 }

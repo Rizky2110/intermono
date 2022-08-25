@@ -364,7 +364,7 @@ export const GlobalStyles = createGlobalStyle`
   
   body {
     font-family: 'Poppins', sans-serif;
-    background-color: ${(props) => props.theme.colors.error};
+    background-color: ${(props) => props.theme.colors.body};
     color: ${(props) => props.theme.colors.text};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
