@@ -3,7 +3,9 @@ import styled from "styled-components";
 import { ButtonLink, Button, Box, BoxLink } from "ui/sc";
 import { useTheme } from "src/app/contexts/ThemeContext";
 
-const StyledDashboard = styled("section")``;
+const StyledDashboard = styled("section")`
+  background-color: ${(props) => props.theme.colors.success};
+`;
 
 const Home: NextLayout = function Home() {
   const { setTheme } = useTheme();

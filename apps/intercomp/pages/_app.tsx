@@ -1,9 +1,10 @@
 import "../styles/global.css";
 import "../public/nprogress.css";
 import React from "react";
+import { Connector } from "mqtt-react-hooks";
 import type { AppProps } from "next/app";
 import type { NextLayout } from "next";
-import { GlobalStyles, listTheme } from "src/lib/theme";
+import { GlobalStyles } from "src/lib/theme";
 
 import {
   ThemeContextProvider,
@@ -13,16 +14,40 @@ import { useRouter } from "next/router";
 import nProgress from "nprogress";
 import { NavbarContextProvider } from "src/app/contexts/NavbarContext";
 import { Settings } from "luxon";
+import { Provider } from "react-redux";
+import wrapper from "src/app/store";
 
 Settings.defaultZone = "Asia/Jakarta";
+
+type TMqtt = {
+  brokerUrl: string;
+  options: {
+    username: string;
+    password: string;
+    keepalive: number;
+    clientId: string;
+  };
+};
+
+const mqtt: TMqtt = {
+  brokerUrl: process.env.NEXT_PUBLIC_MQTT_BROKER_URL || "",
+  options: {
+    username: process.env.NEXT_PUBLIC_MQTT_USERNAME || "",
+    password: process.env.NEXT_PUBLIC_MQTT_PASSWORD || "",
+    keepalive: 0,
+    clientId: `app-intercomp-${new Date().getTime()}`,
+  },
+};
 
 type AppLayoutProps = AppProps & {
   Component: NextLayout;
 };
 
-function MyApp({ Component, pageProps }: AppLayoutProps) {
+function MyApp({ Component, ...rest }: AppLayoutProps) {
   const router = useRouter();
   const getLayout = Component.getLayout ?? ((page: React.ReactNode) => page);
+  const { store, props } = wrapper.useWrappedStore(rest);
+
   nProgress.configure({
     minimum: 0.3,
     easing: "ease",
@@ -50,14 +75,18 @@ function MyApp({ Component, pageProps }: AppLayoutProps) {
   }, [router]);
 
   return (
-    <ThemeContextProvider>
-      <ThemeContextConsumer>
-        <NavbarContextProvider>
-          <GlobalStyles />
-          {getLayout(<Component {...pageProps} />)}
-        </NavbarContextProvider>
-      </ThemeContextConsumer>
-    </ThemeContextProvider>
+    <Provider store={store}>
+      <ThemeContextProvider>
+        <ThemeContextConsumer>
+          <NavbarContextProvider>
+            <GlobalStyles />
+            <Connector brokerUrl={mqtt.brokerUrl} options={mqtt.options}>
+              {getLayout(<Component {...props.pageProps} />)}
+            </Connector>
+          </NavbarContextProvider>
+        </ThemeContextConsumer>
+      </ThemeContextProvider>
+    </Provider>
   );
 }
 

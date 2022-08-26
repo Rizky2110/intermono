@@ -15,7 +15,6 @@
   "devDependencies": {
     "@types/react": "18.0.8",
     "@types/react-dom": "18.0.3",
-    "@types/styled-components": "^5.1.26",
     "eslint": "^7.32.0",
     "eslint-config-custom": "workspace:*",
     "phosphor-react": "^1.4.1",
@@ -25,7 +24,6 @@
   },
   "dependencies": {
     "core": "workspace:*",
-    "next": "12.2.3",
-    "styled-components": "^5.3.5"
+    "next": "12.2.3"
   }
 }

@@ -3,3 +3,4 @@ export * from "./ButtonLink";
 export * from "./ThemeContext";
 export * from "./BoxLink";
 export * from "./Box";
+export * from "./Input";
