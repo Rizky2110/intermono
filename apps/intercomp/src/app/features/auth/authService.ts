@@ -1,19 +1,22 @@
-import api from "src/lib/service";
-import { AuthLogin, RequestLogin, RequestMe } from "src/dto";
-import { AxiosResponse } from "axios";
+import api, { proxy } from "src/lib/service";
+import { RequestLogin, RequestMe } from "src/dto";
 
 const login = async (data: RequestLogin) => {
-  const res = await api.post<any, AxiosResponse<AuthLogin>>(
-    "/auth/login",
-    data
-  );
+  const res = await proxy.post("/proxy/login", data);
+
+  return res.data;
+};
+
+const logout = async () => {
+  const res = await api.post("/auth/logout", {});
+
+  return res.data;
+};
+
+const me = async () => {
+  const res = await proxy.get("/proxy/me");
 
   if (res.status === 200) {
-    localStorage.setItem(
-      "intercomp::token",
-      JSON.stringify(res.data.result?.token || "")
-    );
-
     localStorage.setItem(
       "intercomp::user",
       JSON.stringify({
@@ -41,22 +44,6 @@ const login = async (data: RequestLogin) => {
       })
     );
   }
-
-  return res.data;
-};
-
-const logout = async () => {
-  const res = await api.post("/auth/logout", {});
-
-  return res.data;
-};
-
-const me = async (data: RequestMe) => {
-  const res = await api.get("/auth/check_token", {
-    headers: {
-      Authorization: data.token,
-    },
-  });
 
   return res.data;
 };

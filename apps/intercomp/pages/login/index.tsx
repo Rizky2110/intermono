@@ -12,8 +12,6 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import type { IconProps } from "phosphor-react";
 
-// import { useAppDispatch, useAppSelector } from "src/app/hook";
-// import { login, me, resetAuth } from "src/app";
 import logo from "public/icons/icon-192x192.png";
 import center from "public/assets/logo/login-center.svg";
 
@@ -168,9 +166,7 @@ const Login: NextPage = function Login() {
     }
 
     if (isSuccess) {
-      const token = JSON.parse(localStorage.getItem("intercomp::token") || "");
-
-      dispatch(me({ token }));
+      dispatch(me());
     }
 
     if (isSuccessMe) {
@@ -263,9 +259,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accessToken = cookies.get("access") || "";
 
   try {
-    const response = await axios.post(
+    const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/check_token`,
-      {},
       {
         headers: {
           "Content-Type": "application/json",
@@ -275,11 +270,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       }
     );
 
-    if (response.data && response.data.datas) {
+    if (response.data && response.data.result) {
       return {
         redirect: {
           destination: "/",
-          permanent: false,
+          permanent: true,
         },
       };
     }

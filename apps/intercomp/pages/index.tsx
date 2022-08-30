@@ -2,23 +2,16 @@ import { NextLayout } from "next";
 import styled from "styled-components";
 import { ButtonLink, Button, Box, BoxLink } from "ui/sc";
 import { useTheme } from "src/app/contexts/ThemeContext";
+import React from "react";
+import { Layout } from "components";
 
-const StyledDashboard = styled("section")`
-  background-color: ${(props) => props.theme.colors.success};
-`;
+const StyledDashboard = styled("section")``;
 
 const Home: NextLayout = function Home() {
   const { setTheme } = useTheme();
   return (
     <StyledDashboard aria-label="dashboard">
-      <BoxLink
-        width="min(100% - 2rem, 800px)"
-        marginLeft="auto"
-        marginRight="auto"
-        backgroundColor="accent"
-        color="purple"
-        display="flex"
-      >
+      <BoxLink>
         <Box flex={1}>
           <h1>hai</h1>
         </Box>
@@ -43,3 +36,7 @@ const Home: NextLayout = function Home() {
 };
 
 export default Home;
+
+Home.getLayout = function getLayout(page: React.ReactNode) {
+  return <Layout title="Dashboard">{page}</Layout>;
+};

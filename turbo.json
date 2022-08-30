@@ -21,7 +21,8 @@
         "$NEXT_PUBLIC_MQTT_PASSWORD",
         "$NEXT_PUBLIC_APP_NAME",
         "$NEXT_PUBLIC_COPYRIGHT",
-        "$NEXT_PUBLIC_RECAPTCHA_SITE_KEY"
+        "$NEXT_PUBLIC_RECAPTCHA_SITE_KEY",
+        "$NODE_ENV"
       ],
       "outputs": [".next/**"]
     }

@@ -54,25 +54,22 @@ export const logout = createAsyncThunk("auth/logout", async (_, thunkApi) => {
   }
 });
 
-export const me = createAsyncThunk(
-  "auth/me",
-  async (data: RequestMe, thunkApi) => {
-    try {
-      return await authService.me(data);
-    } catch (error) {
-      const err = error as AxiosError | Error;
-      if (axios.isAxiosError(err)) {
-        const message = err.response && err.response.data;
-
-        return thunkApi.rejectWithValue(message);
-      }
-
-      const message = err.message || err.toString();
+export const me = createAsyncThunk("auth/me", async (_, thunkApi) => {
+  try {
+    return await authService.me();
+  } catch (error) {
+    const err = error as AxiosError | Error;
+    if (axios.isAxiosError(err)) {
+      const message = err.response && err.response.data;
 
       return thunkApi.rejectWithValue(message);
     }
+
+    const message = err.message || err.toString();
+
+    return thunkApi.rejectWithValue(message);
   }
-);
+});
 
 const initialState: InitialStateAuth = {
   user: user || null,

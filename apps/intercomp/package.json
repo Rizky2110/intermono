@@ -13,6 +13,7 @@
     "axios": "^0.27.2",
     "cookies": "^0.8.0",
     "core": "workspace:*",
+    "http-proxy-middleware": "^2.0.6",
     "luxon": "^3.0.1",
     "mqtt-react-hooks": "3.0.0-alpha.2",
     "next": "12.2.3",

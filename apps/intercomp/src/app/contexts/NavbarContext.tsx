@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 
 const NavbarController = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isHide, setIsHide] = useState<boolean>(false);
 
   return {
