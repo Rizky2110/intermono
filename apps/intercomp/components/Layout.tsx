@@ -9,6 +9,10 @@ type LayoutWrapperProps = {
 const LayoutWrapper = styled("main")<LayoutWrapperProps>`
   .layout-main {
     position: relative;
+
+    &-body {
+      padding: 1rem;
+    }
   }
 
   @media only screen and (min-width: 800px) {
@@ -47,7 +51,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
       <SideBar />
       <div className="layout-main">
         <Navbar titleNav={title} />
-        {children}
+        <div className="layout-main-body">{children}</div>
       </div>
     </LayoutWrapper>
   );

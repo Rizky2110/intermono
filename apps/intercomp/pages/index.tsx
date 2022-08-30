@@ -1,36 +1,29 @@
 import { NextLayout } from "next";
 import styled from "styled-components";
-import { ButtonLink, Button, Box, BoxLink } from "ui/sc";
-import { useTheme } from "src/app/contexts/ThemeContext";
 import React from "react";
-import { Layout } from "components";
+import { Layout, CardBanner } from "components";
 
 const StyledDashboard = styled("section")``;
 
 const Home: NextLayout = function Home() {
-  const { setTheme } = useTheme();
   return (
     <StyledDashboard aria-label="dashboard">
-      <BoxLink>
-        <Box flex={1}>
-          <h1>hai</h1>
-        </Box>
-        <ButtonLink
-          size="small"
-          palette="secondary"
-          onClick={() => setTheme("defaultTheme")}
-        >
-          Set Default Theme
-        </ButtonLink>
-      </BoxLink>
-
-      <Button
-        size="small"
+      <CardBanner
+        palette="info"
+        totalDevice={9999999999999999}
+        title="All Breaker"
+        description="The total number of all breakers that have been recorded and available in the intercom system"
+        buttonTitle="Go to iBreaker"
+        href="/ibreaker"
+      />
+      <CardBanner
         palette="primary"
-        onClick={() => setTheme("defaultTheme")}
-      >
-        Set Default Theme
-      </Button>
+        totalDevice={800}
+        title="All Beacon"
+        description="The total number of all beacons that have been recorded and available in the intercom system"
+        buttonTitle="Go to Sensor"
+        href="/sensor"
+      />
     </StyledDashboard>
   );
 };
