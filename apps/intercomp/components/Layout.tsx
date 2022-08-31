@@ -10,8 +10,10 @@ const LayoutWrapper = styled("main")<LayoutWrapperProps>`
   .layout-main {
     position: relative;
 
-    &-body {
-      padding: 1rem;
+    &Body {
+      width: min(100% - 2rem, 1504px);
+      margin-inline: auto;
+      padding-block: 2rem;
     }
   }
 
@@ -51,7 +53,7 @@ const Layout: React.FC<LayoutProps> = (props: LayoutProps) => {
       <SideBar />
       <div className="layout-main">
         <Navbar titleNav={title} />
-        <div className="layout-main-body">{children}</div>
+        <div className="layout-mainBody">{children}</div>
       </div>
     </LayoutWrapper>
   );

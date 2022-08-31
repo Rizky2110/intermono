@@ -118,6 +118,10 @@ export const defaultTheme: DefaultTheme = {
       default: paletteNormal.danger01,
       opposite: paletteNormal.white,
     },
+    warning: {
+      default: paletteNormal.warning01,
+      opposite: paletteNormal.white,
+    },
     light: {
       default: paletteNormal.white,
       opposite: paletteNormal.primary01,

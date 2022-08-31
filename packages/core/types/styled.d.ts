@@ -84,6 +84,7 @@ declare module "styled-components" {
       secondary: TPalette;
       info: TPalette;
       success: TPalette;
+      warning: TPalette;
       error: TPalette;
     };
     colors: {

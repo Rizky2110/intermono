@@ -132,3 +132,18 @@ export function themeColor(
   }
   return tempColor;
 }
+
+export function addCookieHeader<T = string>(cookie?: T) {
+  type HeaderCookie = {
+    Cookie?: T;
+  };
+
+  const headers: HeaderCookie = {};
+
+  if (cookie) {
+    headers.Cookie = cookie;
+    return headers;
+  }
+
+  return headers;
+}

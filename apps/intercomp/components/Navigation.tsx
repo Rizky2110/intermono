@@ -64,7 +64,7 @@ const StyledNavbar = styled("nav")`
       position: absolute;
       left: 0;
       top: 100%;
-      z-index: 10;
+      z-index: 1001;
       width: 100%;
 
       display: grid;
@@ -258,7 +258,7 @@ const StyledSidebar = styled("aside")<StyledSidebarProps>`
 
   position: fixed;
   background: ${(props) => props.theme.colors.primary};
-  z-index: 100;
+  z-index: 10000;
   min-height: 100vh;
   width: min(100% - 2rem, var(--sidebar-width));
   transition: all 0.5s ease;

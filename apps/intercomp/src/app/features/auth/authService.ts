@@ -1,5 +1,5 @@
 import api, { proxy } from "src/lib/service";
-import { RequestLogin, RequestMe } from "src/dto";
+import { RequestLogin } from "src/dto";
 
 const login = async (data: RequestLogin) => {
   const res = await proxy.post("/proxy/login", data);
