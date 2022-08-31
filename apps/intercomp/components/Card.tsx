@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import styled, { DefaultTheme } from "styled-components";
+import styled from "styled-components";
 import { Box, BoxLink, ButtonLink } from "ui/sc";
 
 export type CardBanner = {
@@ -169,7 +169,17 @@ export const CardBanner: React.FC<CardBanner> = function CardBanner({
             width={150}
             height={132}
             alt=""
-            src="/assets/image/board-128x128-navy.png"
+            src={
+              palette === "primary"
+                ? "/assets/image/board-128x128-navy.png"
+                : palette === "success"
+                ? "/assets/image/board-128x128-green.png"
+                : palette === "warning"
+                ? "/assets/image/board-128x128-yellow.png"
+                : palette === "info"
+                ? "/assets/image/board-128x128-navy.png"
+                : "/assets/image/board-128x128-red.png"
+            }
           />
         </Box>
       </BoxLink>
