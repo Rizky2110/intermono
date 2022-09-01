@@ -158,3 +158,37 @@ export function random(length: number) {
   }
   return result;
 }
+export function getObjectSize(obj: object): number {
+  return Object.keys(obj).length;
+}
+
+export function uriEncode(
+  url: string,
+  datas: object | Array<any>,
+  parentKey = ""
+): string {
+  if (Array.isArray(datas) && datas.length > 0) {
+    datas.forEach((data, key) => {
+      if (
+        (Array.isArray(data) || typeof data === "object") &&
+        (data.length > 0 || getObjectSize(data) > 0)
+      ) {
+        url += uriEncode(url, data, String(key));
+      } else if (parentKey && parentKey !== "")
+        url += `${parentKey}[${String(key)}]=${encodeURI(data)}&`;
+      else url += `${String(key)}=${encodeURI(data)}&`;
+    });
+  } else if (typeof datas === "object" && getObjectSize(datas) > 0) {
+    Object.entries(datas).forEach(([key, data]) => {
+      if (
+        (Array.isArray(data) || typeof data === "object") &&
+        (data.length > 0 || getObjectSize(data) > 0)
+      ) {
+        url += uriEncode(url, data, key);
+      } else if (parentKey && parentKey !== "")
+        url += `${parentKey}[${String(key)}]=${encodeURI(data)}&`;
+      else url += `${String(key)}=${encodeURI(data)}&`;
+    });
+  }
+  return url;
+}

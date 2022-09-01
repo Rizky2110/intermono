@@ -10,6 +10,7 @@ const PROXY_URL = process.env.NEXT_PUBLIC_PROXY_URL;
 export const config = {
   api: {
     bodyParser: false,
+    externalResolver: true,
   },
 };
 

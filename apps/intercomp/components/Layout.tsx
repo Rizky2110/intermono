@@ -27,6 +27,10 @@ const LayoutWrapper = styled("main")<LayoutWrapperProps>`
       width: calc(100% - var(--sidebar-width));
       max-width: calc(100% - var(--sidebar-width));
       transition: all 0.5s ease;
+
+      &Body {
+        width: min(100% - 4rem, 1504px);
+      }
     }
   }
 
