@@ -11,7 +11,7 @@ import {
 } from "./system";
 import { Tooltip } from "./Tooltip";
 
-export interface TextViewLinkProps
+export interface TextViewProps
   extends StandardProps<React.HTMLAttributes<HTMLSpanElement>, "children">,
     BaseTextStyleProps,
     BaseFontStyleProps,
@@ -21,7 +21,6 @@ export interface TextViewLinkProps
   size?: keyof Pick<DefaultTheme, "typography">["typography"]["size"];
   weight?: keyof Pick<DefaultTheme, "typography">["typography"]["weight"];
   component?: keyof JSX.IntrinsicElements;
-  href?: string;
   tooltip?: string | ReactNode;
 }
 
@@ -29,9 +28,9 @@ type AddedProps = {
   as: string;
 };
 
-type ComponentProps = TextViewLinkProps & AddedProps;
+type ComponentProps = TextViewProps & AddedProps;
 
-const StyledTextViewLink = styled("span")<ComponentProps>`
+const StyledTextView = styled("span")<ComponentProps>`
   font: ${(props) => props.font || "inherit"};
   font-family: ${(props) => props.fontFamily || "inherit"};
   font-size: ${(props) => {
@@ -80,62 +79,28 @@ const StyledTextViewLink = styled("span")<ComponentProps>`
   flex-shrink: ${(props) => props.flexShrink};
   flex-wrap: ${(props) => props.flexWrap};
   gap: ${(props) => props.gap};
-  ${(props) => (props.href ? "cursor: pointer;" : "")}
 `;
 
-export const TextViewLink: React.FC<TextViewLinkProps> = function TextViewLink(
-  props: TextViewLinkProps
+export const TextView: React.FC<TextViewProps> = function TextView(
+  props: TextViewProps
 ) {
-  const { children, variant, component, href, tooltip, ...rest } = props;
-  if (href) {
-    if (tooltip) {
-      return (
-        <Tooltip content={tooltip || ""}>
-          <Link href={href} passHref>
-            <StyledTextViewLink
-              variant={variant}
-              as={component || "span"}
-              {...rest}
-            >
-              {children}
-            </StyledTextViewLink>
-          </Link>
-        </Tooltip>
-      );
-    }
-    return (
-      <Link href={href} passHref>
-        <StyledTextViewLink
-          variant={variant}
-          as={component || "span"}
-          {...rest}
-        >
-          {children}
-        </StyledTextViewLink>
-      </Link>
-    );
-  }
-
+  const { children, variant, component, tooltip, ...rest } = props;
   if (tooltip) {
     return (
       <Tooltip content={tooltip || ""}>
-        <StyledTextViewLink
-          variant={variant}
-          as={component || "span"}
-          {...rest}
-        >
+        <StyledTextView variant={variant} as={component || "span"} {...rest}>
           {children}
-        </StyledTextViewLink>
+        </StyledTextView>
       </Tooltip>
     );
   }
   return (
-    <StyledTextViewLink variant={variant} as={component || "span"} {...rest}>
+    <StyledTextView variant={variant} as={component || "span"} {...rest}>
       {children}
-    </StyledTextViewLink>
+    </StyledTextView>
   );
 };
 
-TextViewLink.defaultProps = {
+TextView.defaultProps = {
   variant: "standard",
 };

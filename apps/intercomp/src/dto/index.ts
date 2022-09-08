@@ -5,3 +5,4 @@ export * from "./role";
 export * from "./component";
 export * from "./group";
 export * from "./schedule";
+export * from "./config";

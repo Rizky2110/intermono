@@ -4,6 +4,9 @@ import React from "react";
 import { Connector } from "mqtt-react-hooks";
 import type { AppProps } from "next/app";
 import type { NextLayout } from "next";
+import nProgress from "nprogress";
+import { Settings } from "luxon";
+import { Provider } from "react-redux";
 import { GlobalStyles } from "src/lib/theme";
 
 import {
@@ -11,14 +14,15 @@ import {
   ThemeContextConsumer,
 } from "src/app/contexts/ThemeContext";
 import { useRouter } from "next/router";
-import nProgress from "nprogress";
 import { NavbarContextProvider } from "src/app/contexts/NavbarContext";
-import { Settings } from "luxon";
-import { Provider } from "react-redux";
 import wrapper from "src/app/store";
+import dynamic from "next/dynamic";
 
 Settings.defaultZone = "Asia/Jakarta";
 
+const Toast = dynamic<Record<string, unknown>>(() =>
+  import("ui/sc").then((mod) => mod.Toast)
+);
 type TMqtt = {
   brokerUrl: string;
   options: {
@@ -80,6 +84,7 @@ function MyApp({ Component, ...rest }: AppLayoutProps) {
         <ThemeContextConsumer>
           <NavbarContextProvider>
             <GlobalStyles />
+            <Toast />
             <Connector brokerUrl={mqtt.brokerUrl} options={mqtt.options}>
               {getLayout(<Component {...props.pageProps} />)}
             </Connector>

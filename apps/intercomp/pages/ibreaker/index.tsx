@@ -3,16 +3,40 @@ import styled from "styled-components";
 import Image from "next/image";
 import React from "react";
 import { Layout, Tab, Tabs, TabLabel } from "components";
-import { Box, Flex, IconButton, TBColumn, TextViewLink } from "ui/sc";
+import { useDebounce } from "core";
+import { downloadFileURL } from "core/utils";
+import { DateTime } from "luxon";
+import {
+  Box,
+  ButtonLink,
+  Flex,
+  IconButton,
+  IconButtonLink,
+  TBColumn,
+  TextView,
+  TextViewLink,
+  useAlert,
+} from "ui/sc";
 import dynamic from "next/dynamic";
 import Cookies from "cookies";
 import { IconProps } from "phosphor-react";
 import BreakerView from "src/app/features/breaker/BreakerView";
 import GroupView from "src/app/features/breaker/GroupView";
+import {
+  ModalKind,
+  INITIAL_STATE_MODAL,
+  modalReducer,
+} from "src/app/features/breaker/reducer";
 import wrapper from "src/app/store";
-import { getAllBreakers } from "src/app/action";
-import { useAppSelector } from "src/app/hook";
-import { DataComponentBreaker } from "src/dto";
+import {
+  deleteOneGroup,
+  getAllBreakers,
+  getAllGroups,
+  resetBreaker,
+  resetGroup,
+} from "src/app/action";
+import { useAppDispatch, useAppSelector } from "src/app/hook";
+import { DataComponentBreaker, Group } from "src/dto";
 
 const StyledBreaker = styled("section")``;
 
@@ -44,10 +68,138 @@ const DownloadSimple = dynamic<IconProps>(() =>
   import("phosphor-react").then((mod) => mod.DownloadSimple)
 );
 
-const Breaker: NextLayout = function Breaker() {
-  const [indexTab, setIndexTab] = React.useState(0);
+const TrashSimple = dynamic<IconProps>(() =>
+  import("phosphor-react").then((mod) => mod.Trash)
+);
 
-  const { list } = useAppSelector((state) => state.breaker);
+const ModalResetBreaker = dynamic(
+  () => import("src/app/features/breaker/ModalResetBreaker"),
+  {
+    ssr: false,
+  }
+);
+
+const ModalForceSchedule = dynamic(
+  () => import("src/app/features/breaker/ModalForceSchedule"),
+  {
+    ssr: false,
+  }
+);
+
+const ModalSetting = dynamic(
+  () => import("src/app/features/breaker/ModalSetting"),
+  {
+    ssr: false,
+  }
+);
+
+type GroupColumn = Group["result"];
+
+type ButtonAttributes = {
+  "data-id": {
+    value: number;
+  };
+};
+
+const Breaker: NextLayout = function Breaker() {
+  const dispatch = useAppDispatch();
+  const alert = useAlert();
+  const [indexTab, setIndexTab] = React.useState(0);
+  const [search, setSearch] = React.useState("");
+  const [searchGroup, setSearchGroup] = React.useState("");
+  const [isDownload, setIsDownload] = React.useState(false);
+  const [modalState, dispatchModal] = React.useReducer(
+    modalReducer,
+    INITIAL_STATE_MODAL
+  );
+
+  const {
+    list,
+    isLoading: isLoadingBreaker,
+    isSuccess: isSuccessBreaker,
+    isError: isErrorBreaker,
+  } = useAppSelector((state) => state.breaker);
+
+  const {
+    list: listGroup,
+    isLoading: isLoadingGroup,
+    isSuccess: isSuccessGroup,
+    isError: isErrorGroup,
+  } = useAppSelector((state) => state.group);
+
+  React.useEffect(() => {
+    if (isSuccessBreaker) {
+      dispatch(resetBreaker());
+    }
+
+    if (isErrorBreaker) {
+      dispatch(resetBreaker());
+    }
+
+    if (isSuccessGroup) {
+      dispatch(resetGroup());
+    }
+
+    if (isErrorBreaker) {
+      dispatch(resetGroup());
+    }
+  }, [
+    isSuccessBreaker,
+    isErrorBreaker,
+    dispatch,
+    isSuccessGroup,
+    isErrorGroup,
+  ]);
+
+  const handleCloseModal = () => {
+    dispatchModal({ type: ModalKind.ResetModal });
+  };
+
+  const handleDownload = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>, data: DataComponentBreaker) => {
+      e.stopPropagation();
+      if (!isDownload) {
+        const name = `${String(data.name)
+          .toLowerCase()
+          .replace(/ /g, "_")}.txt`;
+        setIsDownload(true);
+        downloadFileURL(data.file_component_path, `${name}`).then(() => {
+          setIsDownload(false);
+        });
+      } else {
+        // do something
+      }
+    },
+    [isDownload]
+  );
+
+  const handleDelete = React.useCallback(
+    (evt: React.MouseEvent<HTMLElement>) => {
+      evt.stopPropagation();
+
+      const { value } = (
+        evt.currentTarget.attributes as unknown as ButtonAttributes
+      )["data-id"];
+
+      alert({
+        variant: "warning",
+        catchOnCancel: true,
+        title: "Are You Sure ?",
+        message: "Are you sure want to delete this group ?",
+      }).then(() =>
+        dispatch(
+          deleteOneGroup({
+            datas: {
+              id: value.toString(),
+            },
+          })
+        )
+      );
+    },
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const breakerColumns: TBColumn = [
     {
@@ -101,9 +253,7 @@ const Breaker: NextLayout = function Breaker() {
       cell: React.useCallback(
         (value: DataComponentBreaker) => (
           <Box>
-            <TextViewLink>
-              {value?.schedule?.name || "No Schedule"}
-            </TextViewLink>
+            <TextView>{value?.schedule?.name || "No Schedule"}</TextView>
           </Box>
         ),
         []
@@ -114,25 +264,36 @@ const Breaker: NextLayout = function Breaker() {
       label: "Group",
       headCell: (label: string) => <div>{label}</div>,
       cell: React.useCallback((value: DataComponentBreaker) => {
-        const length = value.groups.length;
+        const length = value?.groups?.length || 0;
 
         if (length === 0) {
-          return <TextViewLink>No Group</TextViewLink>;
+          return (
+            <TextViewLink color="error" fontWeight={600}>
+              No Group
+            </TextViewLink>
+          );
         }
-        if (length <= 2) {
+        if (length === 1) {
           return (
             <Flex gap="0.125rem">
-              {value.groups.map((v) => (
-                <TextViewLink key={v.id}>{v.name}</TextViewLink>
+              {value?.groups?.map((v) => (
+                <TextViewLink key={v.id} fontWeight={600}>
+                  {v.name}
+                </TextViewLink>
               ))}
             </Flex>
           );
         }
         return (
-          <Flex gap="0.125rem">
-            {value.groups.slice(0, 2).map((v) => (
-              <TextViewLink key={v.id}>{v.name}</TextViewLink>
+          <Flex gap="0.5rem" alignItems="center">
+            {value?.groups?.slice(0, 1).map((v) => (
+              <TextViewLink key={v.id} fontWeight={600}>
+                {v.name}
+              </TextViewLink>
             ))}
+            <TextView fontSize="12px">
+              +{(value?.groups?.length || 1) - 1} more
+            </TextView>
           </Flex>
         );
       }, []),
@@ -154,20 +315,27 @@ const Breaker: NextLayout = function Breaker() {
       cell: React.useCallback(
         (value: DataComponentBreaker) => (
           <Flex gap="0.125rem" style={{ justifyContent: "center" }}>
-            <IconButton
+            <IconButtonLink
               variant="standard"
               tooltip="Preview"
               palette="secondary"
               size="small"
+              href={`/ibreaker/${value.id}`}
             >
               <Eye weight="fill" />
-            </IconButton>
+            </IconButtonLink>
 
             <IconButton
               variant="standard"
-              tooltip="Refresh"
+              tooltip="Configuration"
               palette="secondary"
               size="small"
+              onClick={() =>
+                dispatchModal({
+                  type: ModalKind.Configuration,
+                  payload: value,
+                })
+              }
             >
               <ArrowClockwise weight="fill" />
             </IconButton>
@@ -177,6 +345,12 @@ const Breaker: NextLayout = function Breaker() {
               tooltip="Schedule"
               palette="secondary"
               size="small"
+              onClick={() =>
+                dispatchModal({
+                  type: ModalKind.ForceUpdate,
+                  payload: value,
+                })
+              }
             >
               <CalendarPlus weight="fill" />
             </IconButton>
@@ -185,6 +359,12 @@ const Breaker: NextLayout = function Breaker() {
               variant="standard"
               tooltip="Setting"
               palette="secondary"
+              onClick={() =>
+                dispatchModal({
+                  type: ModalKind.Setting,
+                  payload: value,
+                })
+              }
               size="small"
             >
               <GearSix weight="fill" />
@@ -195,15 +375,173 @@ const Breaker: NextLayout = function Breaker() {
               tooltip="Download"
               palette="secondary"
               size="small"
+              onClick={(evt) => handleDownload(evt, value)}
             >
               <DownloadSimple weight="fill" />
             </IconButton>
           </Flex>
         ),
-        []
+        [handleDownload]
       ),
     },
   ];
+
+  const groupColumn: TBColumn = [
+    {
+      id: "number",
+      label: "No.",
+      headCell: (label: string) => <TextViewLink>{label}</TextViewLink>,
+      cell: React.useCallback(
+        (value: GroupColumn) => (
+          <Box>
+            <TextViewLink>{value.id}</TextViewLink>
+          </Box>
+        ),
+        []
+      ),
+    },
+    {
+      id: "group_name",
+      label: "Breaker Name",
+      headCell: (label: string) => <TextViewLink>{label}</TextViewLink>,
+      cell: React.useCallback(
+        (value: GroupColumn) => (
+          <Box>
+            <TextViewLink>{value.name}</TextViewLink>
+          </Box>
+        ),
+        []
+      ),
+    },
+    {
+      id: "created_at",
+      label: "Date Created",
+      headCell: (label: string) => <TextViewLink>{label}</TextViewLink>,
+      cell: React.useCallback(
+        (value: GroupColumn) => (
+          <Box>
+            <TextViewLink>
+              {DateTime.fromISO(value.created_at.split(" ")[0])
+                .setLocale("en-US")
+                .toFormat("dd LLL yyyy") || "Unknown"}
+            </TextViewLink>
+          </Box>
+        ),
+        []
+      ),
+    },
+    {
+      id: "used_by_breakers",
+      label: "Used by",
+      headCell: (label: string) => <TextViewLink>{label}</TextViewLink>,
+      cell: React.useCallback(
+        (value: GroupColumn) => (
+          <Box>
+            <TextViewLink fontWeight={600}>
+              {value.component_ids.length} Breaker
+            </TextViewLink>
+          </Box>
+        ),
+        []
+      ),
+    },
+    {
+      id: "action",
+      label: "Action",
+      cellAttr: {
+        style: {
+          width: "15rem",
+        },
+      },
+      headCellAttr: {
+        style: {
+          textAlign: "center",
+        },
+      },
+      headCell: (label: string) => <div>{label}</div>,
+      cell: React.useCallback(
+        (value: DataComponentBreaker) => (
+          <Flex
+            gap="0.5rem"
+            style={{ justifyContent: "center", alignItems: "center" }}
+          >
+            <ButtonLink
+              variant="outline"
+              palette="secondary"
+              size="small"
+              style={{
+                paddingBlock: "0.5rem",
+              }}
+              href={`/ibreaker/g/${value.id}`}
+            >
+              View Detail
+            </ButtonLink>
+
+            <IconButton
+              variant="standard"
+              tooltip="Detele"
+              palette="secondary"
+              size="small"
+              data-id={value.id}
+              onClick={handleDelete}
+            >
+              <TrashSimple weight="fill" />
+            </IconButton>
+          </Flex>
+        ),
+        [handleDelete]
+      ),
+    },
+  ];
+
+  const handleChangePage = (page: number) => {
+    const pagination = {
+      page,
+      page_size: 10,
+      component_type: "breaker" as "breaker" | "beacon" | undefined,
+      filter_search: search,
+    };
+
+    dispatch(getAllBreakers({ datas: pagination }));
+  };
+
+  const handleChangePageGroup = (page: number) => {
+    const pagination = {
+      page,
+      page_size: 10,
+      filter_search: searchGroup,
+    };
+
+    dispatch(getAllGroups({ datas: pagination }));
+  };
+
+  const searchForm = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+
+    const pagination = {
+      page: list.result.current_page,
+      page_size: list.result.per_page,
+      component_type: "breaker" as "breaker" | "beacon" | undefined,
+      filter_search: e.target.value,
+    };
+
+    dispatch(getAllBreakers({ datas: pagination }));
+  };
+
+  const searchFormGroup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchGroup(e.target.value);
+
+    const pagination = {
+      page: listGroup.result.current_page,
+      page_size: listGroup.result.per_page,
+      filter_search: e.target.value,
+    };
+
+    dispatch(getAllGroups({ datas: pagination }));
+  };
+
+  const handleSearch = useDebounce(searchForm);
+  const handleSearchGroup = useDebounce(searchFormGroup);
 
   return (
     <StyledBreaker aria-label="breaker">
@@ -220,7 +558,16 @@ const Breaker: NextLayout = function Breaker() {
             />
           }
         >
-          <BreakerView columns={breakerColumns} datas={list.result.data} />
+          <BreakerView
+            isLoading={isLoadingBreaker}
+            columns={breakerColumns}
+            datas={list.result.data}
+            page={list.result.current_page}
+            perPage={list.result.per_page}
+            totalData={list.result.total}
+            onChangePage={handleChangePage}
+            handleSearch={handleSearch}
+          />
         </Tab>
 
         <Tab
@@ -232,9 +579,36 @@ const Breaker: NextLayout = function Breaker() {
             />
           }
         >
-          <GroupView columns={breakerColumns} datas={list.result.data} />
+          <GroupView
+            columns={groupColumn}
+            datas={listGroup.result.data}
+            isLoading={isLoadingGroup}
+            page={listGroup.result.current_page}
+            perPage={listGroup.result.per_page}
+            totalData={listGroup.result.total}
+            onChangePage={handleChangePageGroup}
+            handleSearch={handleSearchGroup}
+          />
         </Tab>
       </Tabs>
+
+      <ModalResetBreaker
+        isOpen={modalState.isOpenConfiguration}
+        handleClose={handleCloseModal}
+        serial={modalState.serial}
+      />
+
+      <ModalForceSchedule
+        isOpen={modalState.isOpenForceUpdate}
+        handleClose={handleCloseModal}
+        serial={modalState.serial}
+      />
+
+      <ModalSetting
+        isOpen={modalState.isOpenSetting}
+        handleClose={handleCloseModal}
+        id={modalState.id}
+      />
     </StyledBreaker>
   );
 };
@@ -260,6 +634,16 @@ export const getServerSideProps: GetServerSideProps =
           page: 1,
           page_size: 10,
           component_type: "breaker",
+        },
+      })
+    );
+
+    await store.dispatch(
+      getAllGroups({
+        cookie: `access=${accessToken};`,
+        datas: {
+          page: 1,
+          page_size: 10,
         },
       })
     );

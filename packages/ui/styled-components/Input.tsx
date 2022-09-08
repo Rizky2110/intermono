@@ -42,7 +42,8 @@ export interface InputProps
     | "numeric"
     | "date"
     | "password"
-    | "file";
+    | "file"
+    | "time";
   value?: any;
   defaultValue?: any;
   accept?: string;

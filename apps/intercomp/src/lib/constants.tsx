@@ -128,3 +128,8 @@ export interface DefaultError<T = []> {
   message: string;
   datas: T;
 }
+
+export interface BaseModalProps {
+  isOpen: boolean;
+  handleClose: () => void;
+}

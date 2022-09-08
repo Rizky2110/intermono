@@ -8,7 +8,16 @@ export * from "./Tabs";
 export * from "./Skeleton";
 export * from "./Table";
 export * from "./TextViewLink";
+export * from "./TextView";
 export * from "./Tooltip";
 export * from "./Flex";
 export * from "./IconButton";
 export * from "./IconButtonLink";
+export * from "./Pagination";
+export * from "./Modal";
+export * from "./BreadCrumb";
+export * from "./BreadCrumbLink";
+export * from "./Alert";
+
+export { default as Alert } from "./Alert";
+export { default as Toast } from "./Toast";

@@ -1,20 +1,16 @@
 import axios, { AxiosError } from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
-import { uriEncode } from "core/utils";
 import api from "src/lib/service";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method === "GET") {
+  if (req.method === "POST") {
     try {
       const accessToken = req.headers.authorization || "";
 
-      // const params = uriEncode("", JSON.parse(req.query.params as string));
-      const params = uriEncode("", req.query);
-
-      const response = await api.get(`/component?${params}`, {
+      const response = await api.post(`/publish-other`, req.body, {
         headers: {
           Authorization: accessToken,
         },

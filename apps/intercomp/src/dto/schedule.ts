@@ -1,3 +1,4 @@
+import { ServerResponse } from "src/lib/constants";
 import { ComponentType } from "./component";
 
 type Output = {
@@ -31,3 +32,43 @@ export type DataSchedule = {
   component_ids: number[];
   component: any[];
 };
+
+type DateLiveSchedule = {
+  day: string;
+  start: string;
+  finish: string;
+};
+
+type LiveSchedule = {
+  schedule_name: string;
+  host: string;
+  registered: boolean;
+  interval: number;
+  reboot: string;
+  datetime: string;
+  breaker_firmware_host: string;
+  breaker_firmware_url: string;
+  firmware_version: string;
+  wifi: {
+    ssid: string;
+    pass: string;
+  };
+  output_1: {
+    date: Omit<DateLiveSchedule, "day">[];
+    days: DateLiveSchedule[];
+  };
+  output_2: {
+    date: Omit<DateLiveSchedule, "day">[];
+    days: DateLiveSchedule[];
+  };
+  output_3: {
+    date: Omit<DateLiveSchedule, "day">[];
+    days: DateLiveSchedule[];
+  };
+};
+
+export type DataForceSchedule = {
+  live_schedule: LiveSchedule | false | null;
+};
+
+export type ForceSchedule = ServerResponse<DataForceSchedule>;

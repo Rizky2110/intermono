@@ -10,9 +10,10 @@ type Query = {
   page?: number;
   page_size?: number;
   component_type?: "breaker" | "beacon";
+  filter_search?: string;
 };
 
-type LastRootData = {
+export type LastRootData = {
   id: number;
   device_id: number;
   box_id: number | null;
@@ -26,9 +27,15 @@ type LastRootData = {
   created_at: string;
   updated_at: string;
   device: any;
+  merchant: any;
+  driver: any;
+  vehicle: any;
+  box: any;
+  device_variant: any;
+  device_type: any;
 };
 
-type LastData = {
+export type LastData = {
   id: string;
   ip: string;
   datetime: string;
@@ -53,6 +60,15 @@ export type ComponentType = {
   updated_at: string;
 };
 
+export type ComponentConfigData = {
+  breaker_interval: string;
+  breaker_restart: string;
+  breaker_wifi_ssid: string;
+  breaker_wifi_password: string;
+  breaker_version: string;
+  breaker_connection: string;
+};
+
 export type DataComponentBreaker = {
   id: number;
   unique_identity: string;
@@ -71,10 +87,10 @@ export type DataComponentBreaker = {
   last_publish_breaker: string | null;
   last_root_data: LastRootData | null;
   last_data: LastData | null;
-  config_data: string | null;
+  config_data: ComponentConfigData | null;
   component_type: ComponentType;
   schedule: DataSchedule | null;
-  groups: DataGroup[];
+  groups?: DataGroup[];
 };
 
 export type Breakers = ServerResponse<
@@ -83,4 +99,17 @@ export type Breakers = ServerResponse<
   }
 >;
 
+export type Breaker = ServerResponse<DataComponentBreaker>;
+
+export type RequestComponentBreakerSetting = DefaultRequest<
+  {
+    id: number;
+    body: ComponentConfigData;
+  },
+  string
+>;
 export type RequestComponentBreaker = DefaultRequest<Query, string>;
+export type RequestComponentBreakerGetOne = DefaultRequest<
+  { id: string },
+  string
+>;

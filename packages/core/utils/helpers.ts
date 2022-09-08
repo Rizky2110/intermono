@@ -1,5 +1,11 @@
 import { DefaultTheme } from "styled-components";
 
+declare global {
+  interface Navigator {
+    msSaveBlob?: (blob: any, defaultName?: string) => boolean;
+  }
+}
+
 export const PACKAGE_NAME = "core-must-update";
 export const sayHello = () => `Hello World iam ${PACKAGE_NAME} package`;
 
@@ -192,3 +198,257 @@ export function uriEncode(
   }
   return url;
 }
+
+export function downloadFileURL(fileURL: string, fileName = "file") {
+  return new Promise((resolve, reject) => {
+    try {
+      const url = fileURL;
+      const req = new XMLHttpRequest();
+      req.open("GET", url, true);
+      req.responseType = "blob";
+      req.onload = () => {
+        const blob = new Blob([req.response], {
+          type: "application/octet-stream",
+        });
+        const isIE = false || !!document.DOCUMENT_NODE;
+        if (isIE && typeof window.navigator.msSaveBlob !== "undefined") {
+          window.navigator.msSaveBlob(blob, fileName);
+        } else {
+          const blobURL =
+            window.URL && window.URL.createObjectURL
+              ? window.URL.createObjectURL(blob)
+              : window.webkitURL.createObjectURL(blob);
+          const tempLink = document.createElement("a");
+          tempLink.style.display = "none";
+          tempLink.href = blobURL;
+          tempLink.setAttribute("download", fileName);
+
+          // Safari thinks _blank anchor are pop ups. We only want to set _blank
+          // target if the browser does not support the HTML5 download attribute.
+          // This allows you to download files in desktop safari if pop up blocking
+          // is enabled.
+          if (typeof tempLink.download === "undefined") {
+            tempLink.setAttribute("target", "_blank");
+          }
+
+          document.body.appendChild(tempLink);
+          tempLink.click();
+
+          // Fixes "webkit blob resource error 1"
+          setTimeout(() => {
+            document.body.removeChild(tempLink);
+            window.URL.revokeObjectURL(blobURL);
+          }, 200);
+        }
+        resolve({ status: true });
+      };
+      req.onerror = () => {
+        resolve({ status: false });
+      };
+      req.send();
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+export function convertHouseInSecond(value: string) {
+  const splited = value.split(":");
+
+  return +splited[0] * 60 * 60 + +splited[1] * 60;
+}
+
+export const mapDark = {
+  zoomControl: false,
+  mapTypeControl: false,
+  scaleControl: false,
+  streetViewControl: false,
+  rotateControl: false,
+  fullscreenControl: true,
+  styles: [
+    {
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#212121",
+        },
+      ],
+    },
+    {
+      elementType: "labels.icon",
+      stylers: [
+        {
+          visibility: "off",
+        },
+      ],
+    },
+    {
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      elementType: "labels.text.stroke",
+      stylers: [
+        {
+          color: "#212121",
+        },
+      ],
+    },
+    {
+      featureType: "administrative",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      featureType: "administrative.country",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#9e9e9e",
+        },
+      ],
+    },
+    {
+      featureType: "administrative.land_parcel",
+      stylers: [
+        {
+          visibility: "off",
+        },
+      ],
+    },
+    {
+      featureType: "administrative.locality",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#bdbdbd",
+        },
+      ],
+    },
+    {
+      featureType: "poi",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#181818",
+        },
+      ],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#616161",
+        },
+      ],
+    },
+    {
+      featureType: "poi.park",
+      elementType: "labels.text.stroke",
+      stylers: [
+        {
+          color: "#1b1b1b",
+        },
+      ],
+    },
+    {
+      featureType: "road",
+      elementType: "geometry.fill",
+      stylers: [
+        {
+          color: "#2c2c2c",
+        },
+      ],
+    },
+    {
+      featureType: "road",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#8a8a8a",
+        },
+      ],
+    },
+    {
+      featureType: "road.arterial",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#373737",
+        },
+      ],
+    },
+    {
+      featureType: "road.highway",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#3c3c3c",
+        },
+      ],
+    },
+    {
+      featureType: "road.highway.controlled_access",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#4e4e4e",
+        },
+      ],
+    },
+    {
+      featureType: "road.local",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#616161",
+        },
+      ],
+    },
+    {
+      featureType: "transit",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#757575",
+        },
+      ],
+    },
+    {
+      featureType: "water",
+      elementType: "geometry",
+      stylers: [
+        {
+          color: "#000000",
+        },
+      ],
+    },
+    {
+      featureType: "water",
+      elementType: "labels.text.fill",
+      stylers: [
+        {
+          color: "#3d3d3d",
+        },
+      ],
+    },
+  ],
+};

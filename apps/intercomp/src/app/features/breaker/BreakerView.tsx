@@ -1,8 +1,18 @@
 import dynamic from "next/dynamic";
 import { IconProps } from "phosphor-react";
+import React from "react";
 import { DataComponentBreaker } from "src/dto";
 import styled from "styled-components";
-import { Input, Select, Box, TableBuilder, TBColumn } from "ui/sc";
+import {
+  Input,
+  Select,
+  Box,
+  TableBuilder,
+  TBColumn,
+  Pagination,
+  Flex,
+  FlexItem,
+} from "ui/sc";
 
 const StyledBreakerView = styled("section")`
   width: 100%;
@@ -81,13 +91,25 @@ const MagnifyingGlass = dynamic<IconProps>(() =>
 );
 
 export type BreakerViewProps = {
+  isLoading: boolean;
   datas: DataComponentBreaker[];
   columns: TBColumn;
+  page: number;
+  perPage: number;
+  totalData: number;
+  onChangePage: (page: number) => void;
+  handleSearch: (evt: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const BreakerView: React.FC<BreakerViewProps> = function BreakerView({
+  isLoading,
   datas,
   columns,
+  page,
+  perPage,
+  totalData,
+  onChangePage,
+  handleSearch,
 }: BreakerViewProps) {
   return (
     <StyledBreakerView>
@@ -99,6 +121,8 @@ const BreakerView: React.FC<BreakerViewProps> = function BreakerView({
           }
           placeholder="Search"
           className="input"
+          name="search"
+          onChange={handleSearch}
         />
 
         <Box className="breaker-viewHeaderShow">
@@ -113,7 +137,18 @@ const BreakerView: React.FC<BreakerViewProps> = function BreakerView({
       </Box>
 
       <Box className="breaker-viewBody">
-        <TableBuilder columns={columns} datas={datas} />
+        <TableBuilder isLoading={isLoading} columns={columns} datas={datas} />
+
+        <Flex marginTop="1rem" marginBottom="1rem">
+          <FlexItem flex={1} />
+
+          <Pagination
+            page={page}
+            perPage={perPage}
+            totalData={totalData}
+            onChangePage={onChangePage}
+          />
+        </Flex>
       </Box>
     </StyledBreakerView>
   );
