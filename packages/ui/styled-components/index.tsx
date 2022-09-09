@@ -18,6 +18,7 @@ export * from "./Modal";
 export * from "./BreadCrumb";
 export * from "./BreadCrumbLink";
 export * from "./Alert";
+export * from "./Stepper";
 
 export { default as Alert } from "./Alert";
 export { default as Toast } from "./Toast";

@@ -203,32 +203,25 @@ const Breaker: NextLayout = function Breaker() {
 
   const breakerColumns: TBColumn = [
     {
-      id: "image",
-      label: "",
+      id: "serial_number",
+      label: "Serial Number",
       headCell: (label: string) => <div>{label}</div>,
       cell: React.useCallback(
         (value: DataComponentBreaker) => (
-          <Box marginLeft="1rem">
+          <Flex
+            style={{
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
             <Image
               alt=""
               src="/assets/image/board-128x128-navy.png"
               width={32}
               height={32}
             />
-          </Box>
-        ),
-        []
-      ),
-    },
-    {
-      id: "serial_number",
-      label: "Serial Number",
-      headCell: (label: string) => <div>{label}</div>,
-      cell: React.useCallback(
-        (value: DataComponentBreaker) => (
-          <Box>
             <TextViewLink>{value.serial}</TextViewLink>
-          </Box>
+          </Flex>
         ),
         []
       ),
@@ -387,19 +380,6 @@ const Breaker: NextLayout = function Breaker() {
   ];
 
   const groupColumn: TBColumn = [
-    {
-      id: "number",
-      label: "No.",
-      headCell: (label: string) => <TextViewLink>{label}</TextViewLink>,
-      cell: React.useCallback(
-        (value: GroupColumn) => (
-          <Box>
-            <TextViewLink>{value.id}</TextViewLink>
-          </Box>
-        ),
-        []
-      ),
-    },
     {
       id: "group_name",
       label: "Breaker Name",

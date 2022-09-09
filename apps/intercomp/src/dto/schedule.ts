@@ -1,5 +1,9 @@
-import { ServerResponse } from "src/lib/constants";
-import { ComponentType } from "./component";
+import {
+  BaseServerSuccessPagination,
+  DefaultRequest,
+  ServerResponse,
+} from "src/lib/constants";
+import { ComponentType, DataComponentBreaker } from "./component";
 
 type Output = {
   day: number;
@@ -16,6 +20,7 @@ export type DataSchedule = {
   deleted_at: string | null;
   created_at: string;
   updated_at: string;
+  total_components?: number;
   identity: string;
   start_date: string;
   end_date: string;
@@ -29,8 +34,8 @@ export type DataSchedule = {
     };
   };
   component_type: ComponentType;
-  component_ids: number[];
-  component: any[];
+  component_ids: DataComponentBreaker[];
+  component: DataComponentBreaker[];
 };
 
 type DateLiveSchedule = {
@@ -72,3 +77,18 @@ export type DataForceSchedule = {
 };
 
 export type ForceSchedule = ServerResponse<DataForceSchedule>;
+export type Schedules = ServerResponse<
+  BaseServerSuccessPagination & {
+    data: Omit<DataSchedule, "component_ids" | "component">[];
+  }
+>;
+export type Schedule = ServerResponse<DataSchedule>;
+
+type Query = {
+  page?: number;
+  page_size?: number;
+  filter_search?: string;
+};
+
+export type RequestSchedules = DefaultRequest<Query, string>;
+export type RequestOneSchedule = DefaultRequest<{ id: string }, string>;

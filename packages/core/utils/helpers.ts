@@ -258,6 +258,14 @@ export function convertHouseInSecond(value: string) {
   return +splited[0] * 60 * 60 + +splited[1] * 60;
 }
 
+export function isMobile() {
+  const isMobileDevice = /iPhone|iPad|iPod|Android|Opera Mini|IEMobile/i.test(
+    navigator.userAgent
+  );
+  if (isMobileDevice) return true;
+  return false;
+}
+
 export const mapDark = {
   zoomControl: false,
   mapTypeControl: false,

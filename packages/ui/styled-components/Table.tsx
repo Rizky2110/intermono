@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { hexToRgba, themeColor } from "core";
+import { isMobile } from "core/utils";
 import styled from "styled-components";
 import {
   BaseLayoutStyleProps,
@@ -10,6 +11,9 @@ import { Box } from "./Box";
 import { Checkbox } from "./Input";
 import { Skeleton } from "./Skeleton";
 import { TextViewLink } from "./TextViewLink";
+import { TextView } from "./TextView";
+import { IconButton } from "./IconButton";
+import { Plus } from "phosphor-react";
 
 export interface TableProps
   extends StandardProps<React.HTMLAttributes<HTMLTableElement>, "children">,
@@ -277,7 +281,8 @@ const StyledDefaultTableBuilder = styled.div<TableBuilderProps>`
 `;
 
 const StyledTableBuilder = styled(StyledDefaultTableBuilder)`
-  ${({ hidden }) => hidden && `display: none;`}
+  ${({ hidden }) => hidden && `display: none;`}${({ hidden }) =>
+    hidden && `display: none;`}
   .table-head {
     .custom-input,
     .custom-select {
@@ -309,6 +314,79 @@ const StyledTableBuilder = styled(StyledDefaultTableBuilder)`
   .table-body {
     background-color: ${({ theme }) =>
       hexToRgba(theme.palette.primary.opposite, 0.02)};
+    .cell-checbox {
+      min-width: 5rem;
+      height: 100%;
+      & > * {
+        margin-right: 0.5rem;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
+    .table-cell {
+      max-width: 12rem;
+    }
+    .toggle-expand {
+      padding: 0.125rem;
+      background-color: ${({ theme }) => hexToRgba(theme.colors.primary, 0.1)};
+      &:hover {
+        background-color: ${({ theme }) =>
+          hexToRgba(theme.colors.primary, 0.2)};
+      }
+      svg {
+        width: 0.875rem;
+        height: 0.875rem;
+      }
+    }
+    .row-expand {
+      display: none;
+      &.open {
+        display: table-row;
+      }
+    }
+    .cell-expand {
+      padding: 0.5rem 2rem 0.5rem 2rem;
+      table {
+        border-collapse: collapse;
+        tr {
+          border-bottom: solid 0.063rem ${({ theme }) => theme.colors.divider};
+          td {
+            padding: 0.5rem 1rem;
+          }
+        }
+        tr:last-child {
+          border: none;
+        }
+      }
+    }
+  }
+  @media (max-width: 26.563rem) {
+    .table-body .cell-expand {
+      padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    }
+  }
+  @media (max-width: 23.438rem) {
+    .table-body .cell-expand {
+      table {
+        display: flex;
+        flex-direction: column;
+        border-collapse: collapse;
+        tr {
+          border-bottom: solid 0.063rem ${({ theme }) => theme.colors.divider};
+          display: flex;
+          flex-direction: column;
+          td {
+            &.title {
+              font-weight: ${({ theme }) => theme.typography.weight.sub2};
+            }
+            padding: 0.5rem 0.5rem;
+          }
+        }
+        tr:last-child {
+          border: none;
+        }
+      }
+    }
   }
 `;
 
@@ -379,6 +457,7 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
   /**
    * SELECT OPTIONS VARIABLE
    */
+  const tableRef = React.useRef<HTMLDivElement>(null);
   const noCheckbox = selectableOption?.noCheckbox || false;
   const conditionalStyle = selectableOption?.conditionalAttr || [];
   let isAllSelected = selectableOption?.isAllSelected || false;
@@ -386,8 +465,48 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
   const onSelectAll = selectableOption?.onSelectAll;
   const onSelect = selectableOption?.onSelect;
   if (typeof isAllSelected === "function") isAllSelected = isAllSelected();
+  const totalColumn = columns.length;
+  const [maxColumn, setMaxColumn] = React.useState<number>(totalColumn);
+  const [expandIds, setExpandIds] = React.useState<number[]>([]);
+  const checkWidth = React.useCallback(() => {
+    const el = tableRef.current;
+    const currWidth = el?.clientWidth || 0;
+    if (isMobile()) {
+      if (currWidth > 550) setMaxColumn(totalColumn);
+      else if (currWidth > 425) setMaxColumn(3);
+      else if (currWidth > 375) setMaxColumn(2);
+      else setMaxColumn(1);
+    } else {
+      setMaxColumn(totalColumn);
+    }
+  }, [totalColumn]);
+
+  React.useEffect(() => {
+    checkWidth();
+    window.addEventListener("resize", checkWidth);
+    return () => {
+      window.removeEventListener("resize", checkWidth);
+    };
+  }, [checkWidth, tableRef]);
+
+  const onClickExpand = (
+    id: number,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.stopPropagation();
+    if (expandIds.includes(id)) {
+      const combine = expandIds.filter((item) => item !== id);
+      setExpandIds(combine);
+    } else {
+      // const combine = _.union(expandIds, [id])
+      // const combine = [...new Set<number>([...expandIds, id])];
+      const combine = Array.from(new Set([...expandIds, id]));
+      setExpandIds(combine);
+    }
+  };
+
   return (
-    <StyledTableBuilder {...props}>
+    <StyledTableBuilder ref={tableRef} {...props}>
       <Box position="relative">
         <Skeleton
           position="absolute"
@@ -409,12 +528,12 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
         >
           <TableHead className="table-head">
             <TableRow className="table-row">
-              {selectable && !noCheckbox ? (
-                <TableCell className="table-cell">
-                  <TextViewLink marginBottom="0.25rem" component="div">
+              {(selectable && !noCheckbox) || totalColumn > maxColumn ? (
+                <TableCell className="table-cell tools">
+                  <TextView marginBottom="0.25rem" component="div">
                     #
-                  </TextViewLink>
-                  {onSelectAll ? (
+                  </TextView>
+                  {selectable && !noCheckbox && onSelectAll ? (
                     <Checkbox
                       round
                       data-role="table-checkbox"
@@ -422,7 +541,7 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
                       palette={checkboxPalette}
                       size="small"
                       value=""
-                      checked={isAllSelected || false}
+                      checked={(isAllSelected as boolean) || false}
                       onChange={onSelectAll}
                     />
                   ) : null}
@@ -433,6 +552,7 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
                   const attr = item?.headCellAttr;
                   const label = item?.label || "";
                   const keyColumn = `column-${indexColumn}`;
+                  if (indexColumn >= maxColumn) return null;
                   return (
                     <TableCell
                       style={attr?.style}
@@ -442,7 +562,7 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
                       {item.headCell ? (
                         item.headCell(label)
                       ) : (
-                        <TextViewLink>{label}</TextViewLink>
+                        <TextView>{label}</TextView>
                       )}
                     </TableCell>
                   );
@@ -466,7 +586,8 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
                     if (item.className) customClass += ` ${item.className}`;
                   }
                 });
-                return (
+                const toggleId = `row-expand-${indexData}`;
+                return [
                   <TableRow
                     data-role="table-row"
                     style={customStyle}
@@ -481,24 +602,33 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
                     }}
                     selected={isItemSelected || false}
                   >
-                    {selectable && !noCheckbox ? (
+                    {(selectable && !noCheckbox) || totalColumn > maxColumn ? (
                       <TableCell
                         padding="checkbox"
-                        className="table-cell"
-                        style={{ padding: "auto" }}
+                        className="table-cell cell-checbox"
                       >
-                        <Checkbox
-                          round
-                          palette={checkboxPalette}
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (onSelect) onSelect(row, e);
-                          }}
-                          onChange={() => {}}
-                          disabled={disabled}
-                          checked={isItemSelected || false}
-                        />
+                        {selectable && !noCheckbox && (
+                          <Checkbox
+                            round
+                            palette={checkboxPalette}
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (onSelect) onSelect(row, e);
+                            }}
+                            onChange={() => {}}
+                            disabled={disabled}
+                            checked={isItemSelected || false}
+                          />
+                        )}
+                        {totalColumn > maxColumn && (
+                          <IconButton
+                            className="toggle-expand"
+                            onClick={(e) => onClickExpand(indexData, e)}
+                          >
+                            <Plus />
+                          </IconButton>
+                        )}
                       </TableCell>
                     ) : null}
 
@@ -507,6 +637,7 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
                         const keyColumn = `column-${indexColumn}`;
                         const cellAttr = item?.cellAttr;
                         const cell = item?.cell;
+                        if (indexColumn >= maxColumn) return null;
                         return (
                           <TableCell
                             style={cellAttr?.style}
@@ -517,8 +648,36 @@ export const TableBuilder: React.FC<TableBuilderProps> = function TableBuilder(
                           </TableCell>
                         );
                       })}
-                  </TableRow>
-                );
+                  </TableRow>,
+                  <TableRow
+                    className={`table-row row-expand ${
+                      expandIds.includes(indexData) ? "open" : ""
+                    }`}
+                    id={toggleId}
+                    key={`${keyData}-expand`}
+                  >
+                    <TableCell colSpan={maxColumn + 1} className="cell-expand">
+                      <table>
+                        <tbody>
+                          {columns &&
+                            columns.map((item, indexColumn: number) => {
+                              const cell = item?.cell;
+                              if (indexColumn < maxColumn) return null;
+                              const keyColExpand = `key-${indexColumn}-expand`;
+                              return (
+                                <tr key={keyColExpand}>
+                                  <td className="title">{item.label}</td>
+                                  <td>
+                                    {cell ? cell(row, indexColumn) : null}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
+                    </TableCell>
+                  </TableRow>,
+                ];
               })
             ) : (
               <TableRow>
